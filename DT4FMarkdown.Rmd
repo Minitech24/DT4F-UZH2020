@@ -1,6 +1,6 @@
 ---
 title: "DT4F"
-author: "Ruixuan Zhou, Kevin Hardegger"
+author: "Kun Zhang, Ziyun Ni, Ruixuan Zhou, Kevin Hardegger"
 date: "1 12 2020"
 output: html_document
 ---
