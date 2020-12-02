@@ -35,7 +35,7 @@ Daily_betas.ts <- as.matrix(Daily_betas['1994-04-29/2017-12-28'])
 Daily_Returns <- as.matrix(returns['1994-04-30/2017-12-29'])
 ```
 
-```{r, Building Portfolios}
+```{r Building Portfolios}
 # create empty vectors with length = number of periods
 P_Returns_P1_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
 P_Returns_P2_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
@@ -51,7 +51,7 @@ P_beta_P4_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
 P_beta_P5_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
 ```
 
-```{r, Calculating Returns}
+```{r Calculating Returns}
 # use a for loop to go through each time period
 
 for (j in 1:dim(Daily_betas.ts)[1])
@@ -60,7 +60,6 @@ for (j in 1:dim(Daily_betas.ts)[1])
   SUB_daily <- Daily_betas.ts[j,]
   
   # divide the stocks contained in SMI into 5 portfolios based on their betas
-  
   P1_P_daily <- subset(SUB_daily,subset = SUB_daily < quantile(SUB_daily , c(0.2),na.rm=TRUE))
   P2_P_daily <- subset(SUB_daily,subset = SUB_daily < quantile(SUB_daily , c(0.4),na.rm=TRUE)& SUB_daily >= quantile(SUB_daily , c(0.2),na.rm=TRUE))
   P3_P_daily <- subset(SUB_daily,subset = SUB_daily < quantile(SUB_daily , c(0.6),na.rm=TRUE)& SUB_daily >= quantile(SUB_daily , c(0.4),na.rm=TRUE))
@@ -68,7 +67,6 @@ for (j in 1:dim(Daily_betas.ts)[1])
   P5_P_daily <- subset(SUB_daily,subset = SUB_daily >= quantile(SUB_daily, c(0.8),na.rm=TRUE))
   
   # calculate the returns of the portfolios of each beta ranked portfolios for every single period
-  
   P_Returns_P1_daily[j] <- mean(Daily_Returns[j,names(P1_P_daily)],na.rm=TRUE)
   P_Returns_P2_daily[j] <- mean(Daily_Returns[j,names(P2_P_daily)],na.rm=TRUE)
   P_Returns_P3_daily[j] <- mean(Daily_Returns[j,names(P3_P_daily)],na.rm=TRUE)
@@ -86,11 +84,19 @@ for (j in 1:dim(Daily_betas.ts)[1])
 
 # calculate the mean returns of the five beta-sorted portfolios 
 
+
 mean_return_P1<-mean(P_Returns_P1_daily,na.rm=TRUE)
 mean_return_P2<-mean(P_Returns_P2_daily,na.rm=TRUE)
 mean_return_P3<-mean(P_Returns_P3_daily,na.rm=TRUE)
 mean_return_P4<-mean(P_Returns_P4_daily,na.rm=TRUE)
 mean_return_P5<-mean(P_Returns_P5_daily,na.rm=TRUE)
+
+print(mean_return_P1<-mean(P_Returns_P1_daily,na.rm=TRUE))
+print(mean_return_P2<-mean(P_Returns_P2_daily,na.rm=TRUE))
+print(mean_return_P3<-mean(P_Returns_P3_daily,na.rm=TRUE))
+print(mean_return_P4<-mean(P_Returns_P4_daily,na.rm=TRUE))
+print(mean_return_P5<-mean(P_Returns_P5_daily,na.rm=TRUE))
+
 
 # calculated the mean standard deviation of the five beta-sorted portfolios
 
