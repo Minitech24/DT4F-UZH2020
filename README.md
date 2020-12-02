@@ -10,4 +10,10 @@ The main criteria for portfolio construction daily beta values of each indiviuda
 
 We present results in a R Markdown file and in a short paper and presentation which are both written in LaTeX.
 
-The main goal of this project is to make use of various IT tools wich are commonly used in todays research. 
+The main goal of this project is to make use of various IT tools wich are commonly used in todays research.  
+
+1.  
+2.  
+3.  
+4.  
+
