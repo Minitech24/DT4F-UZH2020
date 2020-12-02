@@ -6,21 +6,26 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(error = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
 
-```{r,echo=FALSE}
+# loading libraries
 library(xts)
 library(PerformanceAnalytics)
 library(psych)
 library(rollRegres)
 library(roll)
+
+# load csv file prices
 prices <- read.table("StockPricesDaily.csv",sep = ";", header = TRUE, na = "NA")
 date <- as.Date(prices[,1],format="%d.%m.%Y")
 
 prices.ts <- xts(x = prices[,-1], order.by = date)
 returns <- Return.calculate(prices = prices.ts, method = 'discrete')
 
+# load csv file betas
 Daily_betas <- read.table("Stock_betas_daily.csv",sep = ";", header = TRUE, na = "NA")
 date_betas <- as.Date(Daily_betas[,1],format="%d.%m.%Y")
 Daily_betas <- xts(x = Daily_betas[,-1], order.by = date_betas)
@@ -28,15 +33,18 @@ Daily_betas <- xts(x = Daily_betas[,-1], order.by = date_betas)
 Daily_betas.ts <- as.matrix(Daily_betas['1994-04-29/2017-12-28'])
 
 Daily_Returns <- as.matrix(returns['1994-04-30/2017-12-29'])
+```
 
+```{r, Building Portfolios}
 # create empty vectors with length = number of periods
 P_Returns_P1_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
 P_Returns_P2_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
 P_Returns_P3_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
 P_Returns_P4_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
 P_Returns_P5_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
+```
 
-
+```{r, Calculating Returns}
 # use a for loop to go through each time period
 
 for (j in 1:dim(Daily_betas.ts)[1])
@@ -75,7 +83,9 @@ print(sd_P2<-sd(P_Returns_P2_daily,na.rm=TRUE))
 print(sd_P3<-sd(P_Returns_P3_daily,na.rm=TRUE))
 print(sd_P4<-sd(P_Returns_P4_daily,na.rm=TRUE))
 print(sd_P5<-sd(P_Returns_P5_daily,na.rm=TRUE))
+```
 
+```{r, Plotting Results}
 # plot results
 # calculate cumulative returns of each portfolio
 cumulative_returns_p1_monthly <- cumprod(1+P_Returns_P1_daily)
