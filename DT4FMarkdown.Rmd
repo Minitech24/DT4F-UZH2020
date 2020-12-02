@@ -63,18 +63,18 @@ for (j in 1:dim(Daily_betas.ts)[1])
 
 # calculate the mean returns of the five beta-sorted portfolios 
 
-print(mean_return_P1<-mean(P_Returns_P1_daily,na.rm=TRUE))
-print(mean_return_P2<-mean(P_Returns_P2_daily,na.rm=TRUE))
-print(mean_return_P3<-mean(P_Returns_P3_daily,na.rm=TRUE))
-print(mean_return_P4<-mean(P_Returns_P4_daily,na.rm=TRUE))
-print(mean_return_P5<-mean(P_Returns_P5_daily,na.rm=TRUE))
+mean_return_P1<-mean(P_Returns_P1_daily,na.rm=TRUE)
+mean_return_P2<-mean(P_Returns_P2_daily,na.rm=TRUE)
+mean_return_P3<-mean(P_Returns_P3_daily,na.rm=TRUE)
+mean_return_P4<-mean(P_Returns_P4_daily,na.rm=TRUE)
+mean_return_P5<-mean(P_Returns_P5_daily,na.rm=TRUE)
 
 # calculated the mean standard deviation of the five beta-sorted portfolios
-print(sd_P1<-sd(P_Returns_P1_daily,na.rm=TRUE))
-print(sd_P2<-sd(P_Returns_P2_daily,na.rm=TRUE))
-print(sd_P3<-sd(P_Returns_P3_daily,na.rm=TRUE))
-print(sd_P4<-sd(P_Returns_P4_daily,na.rm=TRUE))
-print(sd_P5<-sd(P_Returns_P5_daily,na.rm=TRUE))
+sd_P1<-sd(P_Returns_P1_daily,na.rm=TRUE)
+sd_P2<-sd(P_Returns_P2_daily,na.rm=TRUE)
+sd_P3<-sd(P_Returns_P3_daily,na.rm=TRUE)
+sd_P4<-sd(P_Returns_P4_daily,na.rm=TRUE)
+sd_P5<-sd(P_Returns_P5_daily,na.rm=TRUE)
 
 # plot results
 # calculate cumulative returns of each portfolio
