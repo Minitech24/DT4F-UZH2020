@@ -3,9 +3,9 @@ title: "DT4F"
 author: "Kun Zhang, Ziyun Ni, Ruixuan Zhou, Kevin Hardegger"
 date: "1 12 2020"
 output:
-  html_document: default
-  word_document: default
   pdf_document: default
+  word_document: default
+  html_document: default
 ---
 
 **Load the data**
@@ -134,27 +134,29 @@ cumulative_returns_p4_monthly <- cumprod(1+P_Returns_P4_daily)
 cumulative_returns_p5_monthly <- cumprod(1+P_Returns_P5_daily)
 
 # draw the plot
-plot(x=date_betas[2:6176], y=cumulative_returns_p1_monthly, ylim=c(0,16),type= "l", lty = 1, lwd = 3, col = "yellow", cex.axis = 1, cex.lab = 1, ylab = "Cumulative Return", xlab = "Time")
+png(file="C:/Users/zhour/Desktop/Cumulative Returns.png")
+plot(x=date_betas[2:6176], y=cumulative_returns_p1_monthly, ylim=c(0,16),type= "l", lty = 1, lwd = 3, col = "orange", cex.axis = 1, cex.lab = 1, ylab = "Cumulative Return", xlab = "Time")
 lines(date_betas[2:6176], cumulative_returns_p2_monthly, lty = 3, lwd = 3, col = "blue")
 lines(date_betas[2:6176], cumulative_returns_p3_monthly, lty = 4, lwd = 3, col = "gray")
 lines(date_betas[2:6176], cumulative_returns_p4_monthly, lty = 2, lwd = 3, col = "red")
 lines(date_betas[2:6176], cumulative_returns_p5_monthly, lty = 1, lwd = 3, col = "black")
 legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", "Portfolio 5"), 
        lty = c(1,3,4,2,1), lwd = 3, bty = "n",cex = 1.2, col = c("yellow", "blue", "gray","red","black"))
-
+dev.off()
 ```
 
 **Line Chart of Developments of each beta-based Portfolios **
 ```{r, Plotting Results2}
-
+png(file="C:/Users/zhour/Desktop/daily betas.png")
 # draw the plot
-plot(x=date_betas[2:6176], y=P_beta_P1_daily, ylim=c(0.1,2.6),type= "l", lty = 1, lwd = 3, col = "yellow", cex.axis = 1, cex.lab = 1, ylab = "daily betas", xlab = "Time")
+plot(x=date_betas[2:6176], y=P_beta_P1_daily, ylim=c(0.1,2.6),type= "l", lty = 1, lwd = 3, col = "orange", cex.axis = 1, cex.lab = 1, ylab = "daily betas", xlab = "Time")
 lines(date_betas[2:6176], P_beta_P2_daily, lty = 3, lwd = 3, col = "blue")
 lines(date_betas[2:6176], P_beta_P3_daily, lty = 4, lwd = 3, col = "gray")
 lines(date_betas[2:6176], P_beta_P4_daily, lty = 2, lwd = 3, col = "red")
 lines(date_betas[2:6176], P_beta_P5_daily, lty = 1, lwd = 3, col = "black")
 legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", "Portfolio 5"), 
-       lty = c(1,3,4,2,1), lwd = 3, bty = "n",cex = 1, col = c("yellow", "blue", "gray","red","black"))
+       lty = c(1,3,4,2,1), lwd = 3, bty = "n",cex = 1, col = c("orange", "blue", "gray","red","black"))
+dev.off()
 ```
 
 **Cumulative Return of SMI Index and Swiss Government Bond**
@@ -179,7 +181,7 @@ monthly_total_SMIreturns <- Return.calculate(SMI_monthly)
 
 # calculate cumulative returns of each portfolio
 cumulative_returns_swissbond <- cumprod(1+swissbond_monthly$SWISS.CONFEDERATION.BOND.1.YEAR...RED..YIELD['1994-04-29/2017-12-29'])
-cumulative_returns_SMI <- cumprod(1+monthly_total_SMIreturns$SMI.Total.Return['1994-04-29/2017-12-29'])
+cumulative_returns_SMI <- cumprod(1+monthly_total_SMIreturns$SMI['1994-04-29/2017-12-29'])
 
 plot(x=datebond_monthly[71:355], y=cumulative_returns_swissbond, ylim=c(0.1,6),type= "l", lty = 1, lwd = 3, col = "red", cex.axis = 1, cex.lab = 1, ylab = "Cumulative Return", xlab = "Time")
 lines(datebond_monthly[71:355], cumulative_returns_SMI, lty = 1, lwd = 3, col = "blue")
@@ -192,15 +194,15 @@ legend("topleft", c("Swiss Government Bond", "SMI ETF"),
 **Comparison of cumulative returns between each beta-based portfolio and SMI ETF as well as Swiss Government Bonds**
 ```{r}
 # draw the plot
-plot(x=date_betas[2:6176], y=P_beta_P1_daily, ylim=c(0.1,5),type= "l", lty = 1, lwd = 3, col = "yellow", cex.axis = 1, cex.lab = 1, ylab = "daily betas", xlab = "Time")
-lines(date_betas[2:6176], P_beta_P2_daily, lty = 3, lwd = 3, col = "blue")
-lines(date_betas[2:6176], P_beta_P3_daily, lty = 4, lwd = 3, col = "gray")
-lines(date_betas[2:6176], P_beta_P4_daily, lty = 2, lwd = 3, col = "red")
-lines(date_betas[2:6176], P_beta_P5_daily, lty = 1, lwd = 3, col = "black")
+plot(x=date_betas[2:6176], y=cumulative_returns_p1_monthly, ylim=c(0,16),type= "l", lty = 1, lwd = 3, col = "orange", cex.axis = 1, cex.lab = 1, ylab = "Cumulative Return", xlab = "Time")
+lines(date_betas[2:6176], cumulative_returns_p2_monthly, lty = 3, lwd = 3, col = "blue")
+lines(date_betas[2:6176], cumulative_returns_p3_monthly, lty = 4, lwd = 3, col = "gray")
+lines(date_betas[2:6176], cumulative_returns_p4_monthly, lty = 2, lwd = 3, col = "red")
+lines(date_betas[2:6176], cumulative_returns_p5_monthly, lty = 1, lwd = 3, col = "black")
 lines(datebond_monthly[71:355], cumulative_returns_swissbond, lty = 1, lwd = 3, col = "purple")
 lines(datebond_monthly[71:355], cumulative_returns_SMI, lty = 1, lwd = 3, col = "green")
 legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", "Portfolio 5","Swiss Bond","SMI ETF"), 
-       lty = c(1,3,4,2,1,1,1,1), lwd = 3, bty = "n",cex = 0.9, col = c("yellow", "blue", "gray","red","black","red","green"))
+       lty = c(1,3,4,2,1,1,1,1), lwd = 3, bty = "n",cex = 0.9, col = c("orange", "blue", "gray","red","black","purple","green"))
 ```
 
 
