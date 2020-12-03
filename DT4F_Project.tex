@@ -1,0 +1,58 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Digital Tools for Finance}
+\author{Ruixuan.Zhou }
+\date{October 2020}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+There is a theory which states that if ever anyone discovers exactly what the Universe is for and why it is here, it will instantly disappear and be replaced by something even more bizarre and inexplicable.
+There is another theory which states that this has already happened.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=1.7]{universe}
+\caption{The Universe}
+\label{fig:universe}
+\end{figure}
+
+A simple equation
+\begin{equation}
+    x^2+y^2=1
+\end{equation}
+
+\begin{align}
+    x^2 + y^2 &=1  \\
+    \sum x &= N
+\end{align}
+
+\section{beta as risk measure}
+There is a theory which states that if ever anyone discovers exactly what the Universe is for and why it is here, it will instantly disappear and be replaced by something even more bizarre and inexplicable.
+There is another theory which states that this has already happened.
+
+\section{Evaluating beta-based portfolio}
+First, we created time series for both data sets, daily betas and daily prices of all stocks that have been part of the SMI. Second, we used daily prices to estimate the daily returns for each stock. Then, for each period of the time series, we ranked the stocks included in SMI based on their betas at the previous period and divided them into 5 portfolios based on the 20\%, 40\%, 60\% and 80\% quantiles. Then, we continued this process until the last period of the time series. Last, we computed the average daily return and the average standard deviation of daily returns for each portfolio. The table below summarizes the results:
+
+From above, we can clearly see that the mean standard deviation is low if a portfolio contains stocks with low beta and is high if a portfolio contains the stocks high beta. The magnitudes of the mean daily returns of portfolios 1 to 4 is consistent with the magnitudes of their mean standard deviation. The higher the average standard deviation respective the volatility, the higher the average daily return. One exception is the portfolio 5. It has the highest volatility but surprisingly not the highest mean return, which contradicts the Mean-Variance theory.
+
+We first calculated cumulative returns for each portfolio and we then plotted them. The plot of the development of each portfolio’s cumulative returns is shown below
+
+From the above chart, we can clearly see that the cumulative return of portfolio 4 is the highest, although the beta of the stocks contained in portfolio 4 are only the second highest. The magnitudes of the cumulative returns of portfolios 1 to 4 is also consistent with the magnitudes of the betas of stocks contained in each portfolio. But surprisingly, although Portfolio 5 contains stocks with the highest beta, his returns are the lowest, which contradicts the CAPM theory that predicts a positive relation between beta and expected returns.
+The risk of a stock can be measured by its standard deviation. However, it can be reduced by diversification effect respective by holding other stocks in a portfolio. This means that the right way to measure the risk of a stock is not by its standard deviation but rather by its covariance with the market portfolio. Thus, the CAPM beta should be a more appropriate risk measure.  But our empirical result above fails to produce supporting evidence, since portfolio 5 should have the highest cumulative return among those beta-sorted portfolios according to the CAPM theory.
+
+
+\section{Conclusion}
+``I always thought something was fundamentally wrong with the universe'' \citep{adams1995hitchhiker}
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
