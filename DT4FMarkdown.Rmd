@@ -3,11 +3,10 @@ title: "DT4F"
 author: "Kun Zhang, Ziyun Ni, Ruixuan Zhou, Kevin Hardegger"
 date: "1 12 2020"
 output:
-  pdf_document: default
-  word_document: default
   html_document: default
+  word_document: default
+  pdf_document: default
 ---
-
 **Load the data**
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -21,6 +20,9 @@ library(PerformanceAnalytics)
 library(psych)
 library(rollRegres)
 library(roll)
+library(lemon)
+library(knitr)
+library(kableExtra)
 
 # load csv file prices
 prices <- read.table("StockPricesDaily.csv",sep = ";", header = TRUE, na = "NA")
@@ -56,7 +58,7 @@ P_beta_P5_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
 ```
 
 
-**Average Daily Return of each beta-based ortfolios**
+**Average Daily Return of each beta-based portfolios**
 ```{r Calculating Returns}
 # use a for loop to go through each time period
 
@@ -104,9 +106,8 @@ print(mean_return_P4<-mean(P_Returns_P4_daily,na.rm=TRUE))
 print(mean_return_P5<-mean(P_Returns_P5_daily,na.rm=TRUE))
 ```
 
-
 **Standard Deviation of each beta-based portfolios**
-```{r Calculating Standar Deviation}
+```{r Calculating Standard Deviation}
 # calculated the mean standard deviation of the five beta-sorted portfolios
 
 sd_P1<-sd(P_Returns_P1_daily,na.rm=TRUE)
@@ -121,7 +122,14 @@ print(sd_P3<-sd(P_Returns_P3_daily,na.rm=TRUE))
 print(sd_P4<-sd(P_Returns_P4_daily,na.rm=TRUE))
 print(sd_P5<-sd(P_Returns_P5_daily,na.rm=TRUE))
 ```
+```{r}
+mean_sd = data.frame(sd_P1, sd_P2, sd_P3, sd_P4, sd_P5)
+mean_sd
+``` 
 
+```{r}
+kable(mean_sd, caption = "Mean Standard Deviation ")
+``` 
 
 **Line chart of Cumulative Retunrs of each beta-based Portfolios**
 ```{r, Plotting Results}
@@ -134,7 +142,7 @@ cumulative_returns_p4_monthly <- cumprod(1+P_Returns_P4_daily)
 cumulative_returns_p5_monthly <- cumprod(1+P_Returns_P5_daily)
 
 # draw the plot
-png(file="C:/Users/zhour/Desktop/Cumulative Returns.png")
+#png(file="C:/Users/zhour/Desktop/Cumulative Returns.png")
 plot(x=date_betas[2:6176], y=cumulative_returns_p1_monthly, ylim=c(0,16),type= "l", lty = 1, lwd = 3, col = "orange", cex.axis = 1, cex.lab = 1, ylab = "Cumulative Return", xlab = "Time")
 lines(date_betas[2:6176], cumulative_returns_p2_monthly, lty = 3, lwd = 3, col = "blue")
 lines(date_betas[2:6176], cumulative_returns_p3_monthly, lty = 4, lwd = 3, col = "gray")
@@ -142,12 +150,12 @@ lines(date_betas[2:6176], cumulative_returns_p4_monthly, lty = 2, lwd = 3, col =
 lines(date_betas[2:6176], cumulative_returns_p5_monthly, lty = 1, lwd = 3, col = "black")
 legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", "Portfolio 5"), 
        lty = c(1,3,4,2,1), lwd = 3, bty = "n",cex = 1.2, col = c("yellow", "blue", "gray","red","black"))
-dev.off()
+#dev.off()
 ```
 
 **Line Chart of Developments of each beta-based Portfolios **
 ```{r, Plotting Results2}
-png(file="C:/Users/zhour/Desktop/daily betas.png")
+#png(file="C:/Users/zhour/Desktop/daily betas.png")
 # draw the plot
 plot(x=date_betas[2:6176], y=P_beta_P1_daily, ylim=c(0.1,2.6),type= "l", lty = 1, lwd = 3, col = "orange", cex.axis = 1, cex.lab = 1, ylab = "daily betas", xlab = "Time")
 lines(date_betas[2:6176], P_beta_P2_daily, lty = 3, lwd = 3, col = "blue")
@@ -156,15 +164,15 @@ lines(date_betas[2:6176], P_beta_P4_daily, lty = 2, lwd = 3, col = "red")
 lines(date_betas[2:6176], P_beta_P5_daily, lty = 1, lwd = 3, col = "black")
 legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", "Portfolio 5"), 
        lty = c(1,3,4,2,1), lwd = 3, bty = "n",cex = 1, col = c("orange", "blue", "gray","red","black"))
-dev.off()
+#dev.off()
 ```
 
 **Cumulative Return of SMI Index and Swiss Government Bond**
 ```{r}
 # load the monthly swissbond data
 
-swissbond_monthly <- read.csv("Datastream_Swissbond_monthly.csv",sep = ";", header = TRUE, dec = '.')
-datebond_monthly <- as.Date(swissbond_monthly$ï..Date,format="%d.%m.%Y")
+swissbond_monthly <- read.csv("Swissbond_monthly.csv",sep = ";", header = TRUE, dec = '.')
+datebond_monthly <- as.Date(swissbond_monthly$Date,format="%d.%m.%Y")
 swissbond_monthly <- xts(swissbond_monthly[,-1], order.by = datebond_monthly)
 swissbond_monthly <- swissbond_monthly/100
 swissbond_monthly <- (1+swissbond_monthly)^(1/12)-1
@@ -172,7 +180,7 @@ swissbond_monthly <- (1+swissbond_monthly)^(1/12)-1
 # load the monthly SMI Total return data
 
 SMI_monthly <- read.table("SMIMonthly.csv",sep = ";", header = TRUE, na = "NA")
-dateSMI_monthly <- as.Date(SMI_monthly$ï..Date,format="%d.%m.%Y")
+dateSMI_monthly <- as.Date(SMI_monthly$Date,format="%d.%m.%Y")
 SMI_monthly <- xts(SMI_monthly[,-1], order.by = dateSMI_monthly)
 
 # calculate the total return of the stocks and the SMI
