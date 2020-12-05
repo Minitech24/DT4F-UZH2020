@@ -20,26 +20,70 @@ library(PerformanceAnalytics)
 library(psych)
 library(rollRegres)
 library(roll)
-library(lemon)
+library(dplyr)
+library(reshape)
+library(ggplot2)
+library(RMySQL)
+library(pracma)
 library(knitr)
 library(kableExtra)
+```
 
-# load csv file prices
+```{r}
+# # pullin tables from SQL 
+# 
+# mydb <- dbConnect(MySQL(),
+#                   user = "root",
+#                   password = "sqlside13",
+#                   dbnam = "DT4F",
+#                   port = 3306)
+# 
+# # check database for tables
+# dbListTables(mydb)
+``` 
+
+```{r}
+## Loading via SQL
+# 
+# # Load prices table via SQL query
+# prices = dbGetQuery(mydb, "SELECT * FROM stockdailyprices")
+# # convert columns to numeric
+# columns <-c(2:61)
+# prices[, columns] <- lapply(columns, function(x) as.numeric(prices[[x]]))
+# # create returns df
+# date <- as.Date(prices[,1],format="%d.%m.%Y")
+# prices.ts <- xts(x = prices[,-1], order.by = date)
+# returns <- Return.calculate(prices = prices.ts, method = 'discrete')
+# 
+# # Load beta table via SQL query
+# Daily_betas = dbGetQuery(mydb, "SELECT * FROM stockdailybetas")
+# # convert columns to numeric
+# Daily_betas[, columns] <- lapply(columns, function(x) as.numeric(Daily_betas[[x]]))
+# #create beta df
+# date_betas <- as.Date(Daily_betas[,1],format="%d.%m.%Y")
+# Daily_betas <- xts(x = Daily_betas[,-1], order.by = date_betas)
+# Daily_betas.ts <- as.matrix(Daily_betas['1994-04-29/2017-12-28'])
+# Daily_Returns <- as.matrix(returns['1994-04-30/2017-12-29'])
+```
+
+
+```{r}
+## Loading via CSV files
+
+# Read csv and create returns df
 prices <- read.table("StockPricesDaily.csv",sep = ";", header = TRUE, na = "NA")
 date <- as.Date(prices[,1],format="%d.%m.%Y")
-
 prices.ts <- xts(x = prices[,-1], order.by = date)
 returns <- Return.calculate(prices = prices.ts, method = 'discrete')
 
-# load csv file betas
+#Read csv and create beta df
 Daily_betas <- read.table("Stock_betas_daily.csv",sep = ";", header = TRUE, na = "NA")
 date_betas <- as.Date(Daily_betas[,1],format="%d.%m.%Y")
 Daily_betas <- xts(x = Daily_betas[,-1], order.by = date_betas)
-
 Daily_betas.ts <- as.matrix(Daily_betas['1994-04-29/2017-12-28'])
-
 Daily_Returns <- as.matrix(returns['1994-04-30/2017-12-29'])
 ```
+
 
 ```{r Building Portfolios}
 # create empty vectors with length = number of periods
@@ -58,8 +102,10 @@ P_beta_P5_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
 ```
 
 
-**Average Daily Return of each beta-sorted portfolios**
-```{r Calculating Returns}
+## Average Daily Return of Each Beta-based Portfolios
+```{r}
+# Calculating Returns
+
 # use a for loop to go through each time period
 
 for (j in 1:dim(Daily_betas.ts)[1])
@@ -89,24 +135,50 @@ for (j in 1:dim(Daily_betas.ts)[1])
   P_beta_P4_daily[j] <- mean(Daily_betas.ts[j,names(P4_P_daily)],na.rm=TRUE)
   P_beta_P5_daily[j] <- mean(Daily_betas.ts[j,names(P5_P_daily)],na.rm=TRUE)
 }
+```
 
+## Daily Returns
+```{r}
+# creating Dataframe with daily returns & boxplot 
+DF_Returns_Daily = data.frame(P_Returns_P1_daily, P_Returns_P2_daily, P_Returns_P3_daily, P_Returns_P4_daily, P_Returns_P5_daily)
+
+DF_Returns_Daily = melt(DF_Returns_Daily)
+
+DF_Returns_Daily %>%
+  ggplot(aes(variable, value))+
+  geom_boxplot(varwidth=T, fill="chartreuse1") + 
+    labs(title="Daily Returns of Each Portfolio ", 
+         x="Portfolio",
+         y="Daily Return") +
+  theme(axis.text.x = element_text(angle=0, vjust=0.6))
+
+``` 
+
+### Mean Returns
+```{r}
 # calculate the mean returns of the five beta-sorted portfolios 
-
-
 mean_return_P1<-mean(P_Returns_P1_daily,na.rm=TRUE)
 mean_return_P2<-mean(P_Returns_P2_daily,na.rm=TRUE)
 mean_return_P3<-mean(P_Returns_P3_daily,na.rm=TRUE)
 mean_return_P4<-mean(P_Returns_P4_daily,na.rm=TRUE)
 mean_return_P5<-mean(P_Returns_P5_daily,na.rm=TRUE)
 
-print(mean_return_P1<-mean(P_Returns_P1_daily,na.rm=TRUE))
-print(mean_return_P2<-mean(P_Returns_P2_daily,na.rm=TRUE))
-print(mean_return_P3<-mean(P_Returns_P3_daily,na.rm=TRUE))
-print(mean_return_P4<-mean(P_Returns_P4_daily,na.rm=TRUE))
-print(mean_return_P5<-mean(P_Returns_P5_daily,na.rm=TRUE))
+# create DF for mean returns
+DF_mean_return= data.frame(mean_return_P1, mean_return_P2, mean_return_P3, mean_return_P4, mean_return_P5)
+DF_mean_return = melt(DF_mean_return)
+
+# create bar chart for mean returns
+DF_mean_return %>%
+  ggplot( ) +
+  geom_col(aes(variable, value, fill= variable,width=0.9 )) +
+  scale_fill_manual(values = c("orange", "blue", "gray","red","cyan","violetred1","springgreen4")) + 
+      labs(title="Daily Mean Return of Each Portfolio ", 
+         x="Portfolio",
+         y="Daily Mean Return")  +
+      theme(legend.position="none", axis.text.x = element_text(angle=0, vjust=0.6))
 ```
 
-**Standard Deviation of each beta-sorted portfolios**
+### Standard Deviation of Returns
 ```{r Calculating Standard Deviation}
 # calculated the mean standard deviation of the five beta-sorted portfolios
 
@@ -116,15 +188,23 @@ sd_P3<-sd(P_Returns_P3_daily,na.rm=TRUE)
 sd_P4<-sd(P_Returns_P4_daily,na.rm=TRUE)
 sd_P5<-sd(P_Returns_P5_daily,na.rm=TRUE)
 
-print(sd_P1<-sd(P_Returns_P1_daily,na.rm=TRUE))
-print(sd_P2<-sd(P_Returns_P2_daily,na.rm=TRUE))
-print(sd_P3<-sd(P_Returns_P3_daily,na.rm=TRUE))
-print(sd_P4<-sd(P_Returns_P4_daily,na.rm=TRUE))
-print(sd_P5<-sd(P_Returns_P5_daily,na.rm=TRUE))
+# create DF for standard deviation
+mean_sd = data.frame(sd_P1, sd_P2, sd_P3, sd_P4, sd_P5)
+mean_sd = melt(mean_sd)
+
+# creat bar chart for standard deviation
+mean_sd %>%
+    ggplot( ) +
+    geom_col(aes(variable, value, fill= variable,width=0.9 )) +
+    scale_fill_manual(values = c("orange", "blue", "gray","red","cyan","violetred1","springgreen4")) + 
+    labs(title="Standard Deviation of Each Portfolio ", 
+         x="Portfolio",
+         y="Value") +
+  theme(legend.position="none", axis.text.x = element_text(angle=0, vjust=0.6))
 
 ```
 
-**Summary table of mean daily returns & mean standard deviation of each beta-sorted portfolio**
+### Summary table of mean daily returns & mean standard deviation of each beta-sorted portfolio
 ```{r}
 summary_table<-matrix(0,nrow=2,ncol=5,dimnames=list(c("Mean Daily Return","Mean Standard Deviation"),c("Portfolio1","Portfolio2","Portfolio3","Portfolio4","Portfolio5")))
 summary_table[1,]=c(mean_return_P1,mean_return_P2,mean_return_P3,mean_return_P4,mean_return_P5)
@@ -132,8 +212,69 @@ summary_table[2,]=c(sd_P1,sd_P2,sd_P3,sd_P4,sd_P5)
 summary_table
 ``` 
 
-**Line chart of Cumulative Retunrs of each beta-sorted Portfolios**
+### Beta Analysis
+```{r}
+# create Dataframe with Daily BETAS & boxplot 
+DF_beta_daily = data.frame(P_beta_P1_daily, P_beta_P2_daily, P_beta_P3_daily, P_beta_P4_daily, P_beta_P5_daily)
+DF_beta_daily = melt(DF_beta_daily)
+
+# create box plot for daily betas
+DF_beta_daily %>% 
+  ggplot(aes(variable, value))+
+  geom_boxplot(varwidth=T, fill="goldenrod1") + 
+    labs(title="Daily Beta of Each Portfolio ", 
+         x="Portfolio",
+         y="Beta Value") +
+  theme(axis.text.x = element_text(angle=0, vjust=0.6))
+
+``` 
+
+#### Mean Betas
+```{r}
+# calculate the mean beta of the five beta-sorted portfolios 
+mean_beta_P1<-mean(P_beta_P1_daily,na.rm=TRUE)
+mean_beta_P2<-mean(P_beta_P2_daily,na.rm=TRUE)
+mean_beta_P3<-mean(P_beta_P3_daily,na.rm=TRUE)
+mean_beta_P4<-mean(P_beta_P4_daily,na.rm=TRUE)
+mean_beta_P5<-mean(P_beta_P5_daily,na.rm=TRUE)
+
+# create DF for mean betas
+DF_mean_beta = data.frame(mean_beta_P1, mean_beta_P2, mean_beta_P3, mean_beta_P4, mean_beta_P5)
+DF_mean_beta = melt(DF_mean_beta)
+
+# create bar chart for mean betas
+DF_mean_beta %>%  
+  ggplot( ) +
+    geom_col(aes(variable, value, fill= variable,width=0.9 )) +
+    scale_fill_manual(values = c("orange", "blue", "gray","red","cyan","violetred1","springgreen4")) + 
+  labs(title="Average Beta Value of Each Portfolio", 
+       x="Portfolio",
+       y="Average Beta") +
+  theme(legend.position="none", axis.text.x = element_text(angle=0, vjust=0.6))
+
+```
+
+
+#### Time Series of Changes in Beta values
+```{r, Plotting Results2}
+# Line Chart of Developments of each beta-sorted Portfolios 
+
+#png(file="C:/Users/zhour/Desktop/daily betas.png")
+# draw the plot
+plot(x=date_betas[2:6176], y=P_beta_P1_daily, ylim=c(0.1,2.6),type= "l", lty = 1, lwd = 3, col = "orange", cex.axis = 1, cex.lab = 1, ylab = "Daily Betas", xlab = "Time", main = "Time Series of Beta Values")
+lines(date_betas[2:6176], P_beta_P2_daily, lty = 1, lwd = 3, col = "blue")
+lines(date_betas[2:6176], P_beta_P3_daily, lty = 1, lwd = 3, col = "gray")
+lines(date_betas[2:6176], P_beta_P4_daily, lty = 1, lwd = 3, col = "red")
+lines(date_betas[2:6176], P_beta_P5_daily, lty = 1, lwd = 3, col = "cyan")
+legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", "Portfolio 5"), 
+       lty = 1 , lwd = 3, bty = "n",cex = 1, col = c("gold", "blue", "gray","red","cyan","violetred1","springgreen4"))
+#dev.off()
+```
+
+
+## Cumulative Returns
 ```{r, Plotting Results}
+## Line chart of Cumulative Retunrs of each beta-sorted Portfolios
 # plot results
 # calculate cumulative returns of each portfolio
 cumulative_returns_p1_monthly <- cumprod(1+P_Returns_P1_daily)
@@ -144,75 +285,128 @@ cumulative_returns_p5_monthly <- cumprod(1+P_Returns_P5_daily)
 
 # draw the plot
 #png(file="C:/Users/zhour/Desktop/Cumulative Returns.png")
-plot(x=date_betas[2:6176], y=cumulative_returns_p1_monthly, ylim=c(0,16),type= "l", lty = 1, lwd = 3, col = "orange", cex.axis = 1, cex.lab = 1, ylab = "Cumulative Return", xlab = "Time")
-lines(date_betas[2:6176], cumulative_returns_p2_monthly, lty = 3, lwd = 3, col = "blue")
-lines(date_betas[2:6176], cumulative_returns_p3_monthly, lty = 4, lwd = 3, col = "gray")
-lines(date_betas[2:6176], cumulative_returns_p4_monthly, lty = 2, lwd = 3, col = "red")
-lines(date_betas[2:6176], cumulative_returns_p5_monthly, lty = 1, lwd = 3, col = "black")
+plot(x=date_betas[2:6176], y=cumulative_returns_p1_monthly, ylim=c(0,16),type= "l", lty = 1, lwd = 3, col = "orange", cex.axis = 1, cex.lab = 1, ylab = "Cumulative Return", xlab = "Time", main = "Cumulative Returns of each Portfolio")
+lines(date_betas[2:6176], cumulative_returns_p2_monthly, lty = 1, lwd = 3, col = "blue")
+lines(date_betas[2:6176], cumulative_returns_p3_monthly, lty = 1, lwd = 3, col = "grey")
+lines(date_betas[2:6176], cumulative_returns_p4_monthly, lty = 1, lwd = 3, col = "red")
+lines(date_betas[2:6176], cumulative_returns_p5_monthly, lty = 1, lwd = 3, col = "cyan")
 legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", "Portfolio 5"), 
-       lty = c(1,3,4,2,1), lwd = 3, bty = "n",cex = 1.2, col = c("yellow", "blue", "gray","red","black"))
+       lty = 1,lwd = 3, bty = "n",cex = 1.2, col = c("orange", "blue", "gray","red","cyan","violetred1","springgreen4"))
 #dev.off()
 ```
 
-**Line Chart of Developments of each beta-based Portfolios **
-```{r, Plotting Results2}
-#png(file="C:/Users/zhour/Desktop/daily betas.png")
-# draw the plot
-plot(x=date_betas[2:6176], y=P_beta_P1_daily, ylim=c(0.1,2.6),type= "l", lty = 1, lwd = 3, col = "orange", cex.axis = 1, cex.lab = 1, ylab = "daily betas", xlab = "Time")
-lines(date_betas[2:6176], P_beta_P2_daily, lty = 3, lwd = 3, col = "blue")
-lines(date_betas[2:6176], P_beta_P3_daily, lty = 4, lwd = 3, col = "gray")
-lines(date_betas[2:6176], P_beta_P4_daily, lty = 2, lwd = 3, col = "red")
-lines(date_betas[2:6176], P_beta_P5_daily, lty = 1, lwd = 3, col = "black")
-legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", "Portfolio 5"), 
-       lty = c(1,3,4,2,1), lwd = 3, bty = "n",cex = 1, col = c("orange", "blue", "gray","red","black"))
-#dev.off()
-```
 
-**Cumulative Return of SMI Index and Swiss Government Bond**
+## Cumulative Return of SMI Index and Swiss Government Bond
 ```{r}
-# load the monthly swissbond data
+############################
 
-swissbond_monthly <- read.csv("Swissbond_monthly.csv",sep = ";", header = TRUE, dec = '.',fileEncoding="UTF-8-BOM")
+## unfinished !!! 
+
+############################
+## Loading via SQL
+# # Load Swiss Bonds table via SQL query
+# swissbond_monthly = dbGetQuery(mydb, "SELECT * FROM swissbondsmonthly")
+# 
+# # convert columns to numeric
+# columns <-c(2:61)
+# prices[, columns] <- lapply(columns, function(x) as.numeric(prices[[x]]))
+# 
+# datebond_monthly <- as.Date(swissbond_monthly$Date,format="%d.%m.%Y")
+# swissbond_monthly <- xts(swissbond_monthly[,-1], order.by = datebond_monthly)
+# swissbond_monthly <- swissbond_monthly/100
+# swissbond_monthly <- (1+swissbond_monthly)^(1/12)-1
+# 
+# # Load SMI table via SQL query
+# 
+# dateSMI_monthly <- as.Date(SMI_monthly$Date,format="%d.%m.%Y")
+# SMI_monthly <- xts(SMI_monthly[,-1], order.by = dateSMI_monthly)
+``` 
+
+
+```{r}
+# Loading via CSV files
+
+# load the monthly swissbond data
+swissbond_monthly <- read.csv("Swissbond_monthly.csv",sep = ";", header = TRUE, dec = '.')
 datebond_monthly <- as.Date(swissbond_monthly$Date,format="%d.%m.%Y")
 swissbond_monthly <- xts(swissbond_monthly[,-1], order.by = datebond_monthly)
 swissbond_monthly <- swissbond_monthly/100
 swissbond_monthly <- (1+swissbond_monthly)^(1/12)-1
 
 # load the monthly SMI Total return data
-
-SMI_monthly <- read.table("SMIMonthly.csv",sep = ";", header = TRUE, na = "NA",fileEncoding="UTF-8-BOM")
+SMI_monthly <- read.table("SMIMonthly.csv",sep = ";", header = TRUE, na = "NA")
 dateSMI_monthly <- as.Date(SMI_monthly$Date,format="%d.%m.%Y")
 SMI_monthly <- xts(SMI_monthly[,-1], order.by = dateSMI_monthly)
 
-# calculate the total return of the stocks and the SMI
+``` 
 
+
+### Calculation of SMI and 1YR Swiss Bond Return
+```{r} 
+# calculate the total return of the SMI
 monthly_total_SMIreturns <- Return.calculate(SMI_monthly)
 
-# calculate cumulative returns of each portfolio
+# calculate cumulative returns for both SMI 
 cumulative_returns_swissbond <- cumprod(1+swissbond_monthly$SWISS.CONFEDERATION.BOND.1.YEAR...RED..YIELD['1994-04-29/2017-12-29'])
 cumulative_returns_SMI <- cumprod(1+monthly_total_SMIreturns$SMI['1994-04-29/2017-12-29'])
 
-plot(x=datebond_monthly[71:355], y=cumulative_returns_swissbond, ylim=c(0.1,6),type= "l", lty = 1, lwd = 3, col = "red", cex.axis = 1, cex.lab = 1, ylab = "Cumulative Return", xlab = "Time")
-lines(datebond_monthly[71:355], cumulative_returns_SMI, lty = 1, lwd = 3, col = "blue")
+plot(x=datebond_monthly[71:355], y=cumulative_returns_swissbond, ylim=c(0.1,6),type= "l", lty = 1, lwd = 3, col = "violetred1", cex.axis = 1, cex.lab = 1, ylab = "Cumulative Return", xlab = "Time", main = "Cumulative Returns of Switzerland 1YR Bond and SMI")
+lines(datebond_monthly[71:355], cumulative_returns_SMI, lty = 1, lwd = 3, col = "springgreen4")
 
-legend("topleft", c("Swiss Government Bond", "SMI ETF"), 
-       lty = c(1,1), lwd = 3, bty = "n",cex = 1.2, col = c("red", "blue"))
+legend("topleft", c("Swiss 1YR Bond", "SMI"), 
+       lty = c(1,1), lwd = 3, bty = "n",cex = 1.2, col = c("violetred1", "springgreen4"))
 ```
 
-**Comparison of cumulative returns between each beta-based portfolio and SMI ETF as well as Swiss Government Bonds**
+### Comparison of cumulative returns between each beta-based portfolio and SMI ETF as well as Swiss Government Bonds
 ```{r}
 #png(file="C:/Users/zhour/Desktop/Cumulative Returns with SMI&SGB.png")
 # draw the plot
-plot(x=date_betas[2:6176], y=cumulative_returns_p1_monthly, ylim=c(0,16),type= "l", lty = 1, lwd = 3, col = "orange", cex.axis = 1, cex.lab = 1, ylab = "Cumulative Return", xlab = "Time")
-lines(date_betas[2:6176], cumulative_returns_p2_monthly, lty = 3, lwd = 3, col = "blue")
-lines(date_betas[2:6176], cumulative_returns_p3_monthly, lty = 4, lwd = 3, col = "gray")
-lines(date_betas[2:6176], cumulative_returns_p4_monthly, lty = 2, lwd = 3, col = "red")
-lines(date_betas[2:6176], cumulative_returns_p5_monthly, lty = 1, lwd = 3, col = "black")
-lines(datebond_monthly[71:355], cumulative_returns_swissbond, lty = 1, lwd = 3, col = "purple")
-lines(datebond_monthly[71:355], cumulative_returns_SMI, lty = 1, lwd = 3, col = "green")
-legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", "Portfolio 5","Swiss Bond","SMI ETF"), 
-       lty = c(1,3,4,2,1,1,1,1), lwd = 3, bty = "n",cex = 0.9, col = c("orange", "blue", "gray","red","black","purple","green"))
+plot(x=date_betas[2:6176], y=cumulative_returns_p1_monthly, ylim=c(0,16),type= "l", lty = 1, lwd = 3, col = "orange", cex.axis = 1, cex.lab = 1, ylab = "Cumulative Return", xlab = "Time", main = "Comparison of Cumulative Return")
+lines(date_betas[2:6176], cumulative_returns_p2_monthly, lty = 1, lwd = 3, col = "blue")
+lines(date_betas[2:6176], cumulative_returns_p3_monthly, lty = 1, lwd = 3, col = "gray")
+lines(date_betas[2:6176], cumulative_returns_p4_monthly, lty = 1, lwd = 3, col = "red")
+lines(date_betas[2:6176], cumulative_returns_p5_monthly, lty = 1, lwd = 3, col = "cyan")
+lines(datebond_monthly[71:355], cumulative_returns_swissbond, lty = 1, lwd = 3, col = "violetred1")
+lines(datebond_monthly[71:355], cumulative_returns_SMI, lty = 1, lwd = 3, col = "springgreen4")
+legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", "Portfolio 5","Swiss 1YR Bond","SMI"), 
+       lty = 1, lwd = 3, bty = "n",cex = 0.9, col = c("orange", "blue", "gray","red","cyan","violetred1","springgreen4"))
 #dev.out()
 ```
 
+### Comparison of Yearly Geometric Return
+```{r}
+# bar chart for each portfolio 
 
+# creating DF for Portfolios
+DF_cumulative_pf = data.frame(cumulative_returns_p1_monthly,
+                                   cumulative_returns_p2_monthly,
+                                   cumulative_returns_p3_monthly,
+                                   cumulative_returns_p4_monthly,
+                                   cumulative_returns_p5_monthly)
+DF_cumulative_pf = tail(DF_cumulative_pf,1)
+row.names(DF_cumulative_pf) <- NULL
+
+# creating DF for SMI & Bonds
+DF_cumulative_comp = data.frame(cumulative_returns_swissbond, cumulative_returns_SMI)
+DF_cumulative_comp = tail(DF_cumulative_comp,1)
+row.names(DF_cumulative_comp) <- NULL
+
+# joining both DF
+DF_cumulative_Returns = merge(DF_cumulative_pf, DF_cumulative_comp)
+colnames = c("Portfolio1", "Portfolio2", "Portfolio3", "Portfolio4", "Portfolio5", "SwissBond1YR", "SMI")
+colnames(DF_cumulative_Returns) = colnames
+
+
+DF_cumulative_Returns = melt(DF_cumulative_Returns)
+  
+# calculate geometric mean
+DF_cumulative_Returns %>%
+  mutate(geomMean=round((nthroot(value, 23)-1)*100, digits = 2)) %>%
+  ggplot( ) +
+  geom_col(aes(variable, geomMean, fill= variable,width=0.9 )) +
+  scale_fill_manual(values = c("orange", "blue", "gray","red","cyan","violetred1","springgreen4")) + 
+  labs(title="Comparison of Geometric Yearly Return", 
+       x="Portfolio",
+       y="Percent") +
+  theme(legend.position = "none", axis.text.x = element_text(angle=0, vjust=0.6))
+``` 
