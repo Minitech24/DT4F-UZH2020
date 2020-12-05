@@ -58,7 +58,7 @@ P_beta_P5_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
 ```
 
 
-**Average Daily Return of each beta-based portfolios**
+**Average Daily Return of each beta-sorted portfolios**
 ```{r Calculating Returns}
 # use a for loop to go through each time period
 
@@ -67,7 +67,7 @@ for (j in 1:dim(Daily_betas.ts)[1])
   
   SUB_daily <- Daily_betas.ts[j,]
   
-  # divide the stocks contained in SMI into 5 portfolios based on their betas
+  # divide the stocks contained in SMI into 5 portfolios sorted on their betas
   P1_P_daily <- subset(SUB_daily,subset = SUB_daily < quantile(SUB_daily , c(0.2),na.rm=TRUE))
   P2_P_daily <- subset(SUB_daily,subset = SUB_daily < quantile(SUB_daily , c(0.4),na.rm=TRUE)& SUB_daily >= quantile(SUB_daily , c(0.2),na.rm=TRUE))
   P3_P_daily <- subset(SUB_daily,subset = SUB_daily < quantile(SUB_daily , c(0.6),na.rm=TRUE)& SUB_daily >= quantile(SUB_daily , c(0.4),na.rm=TRUE))
@@ -106,7 +106,7 @@ print(mean_return_P4<-mean(P_Returns_P4_daily,na.rm=TRUE))
 print(mean_return_P5<-mean(P_Returns_P5_daily,na.rm=TRUE))
 ```
 
-**Standard Deviation of each beta-based portfolios**
+**Standard Deviation of each beta-sorted portfolios**
 ```{r Calculating Standard Deviation}
 # calculated the mean standard deviation of the five beta-sorted portfolios
 
@@ -121,17 +121,18 @@ print(sd_P2<-sd(P_Returns_P2_daily,na.rm=TRUE))
 print(sd_P3<-sd(P_Returns_P3_daily,na.rm=TRUE))
 print(sd_P4<-sd(P_Returns_P4_daily,na.rm=TRUE))
 print(sd_P5<-sd(P_Returns_P5_daily,na.rm=TRUE))
+
 ```
+
+**Summary table of mean daily returns & mean standard deviation of each beta-sorted portfolio**
 ```{r}
-mean_sd = data.frame(sd_P1, sd_P2, sd_P3, sd_P4, sd_P5)
-mean_sd
+summary_table<-matrix(0,nrow=2,ncol=5,dimnames=list(c("Mean Daily Return","Mean Standard Deviation"),c("Portfolio1","Portfolio2","Portfolio3","Portfolio4","Portfolio5")))
+summary_table[1,]=c(mean_return_P1,mean_return_P2,mean_return_P3,mean_return_P4,mean_return_P5)
+summary_table[2,]=c(sd_P1,sd_P2,sd_P3,sd_P4,sd_P5)
+summary_table
 ``` 
 
-```{r}
-kable(mean_sd, caption = "Mean Standard Deviation ")
-``` 
-
-**Line chart of Cumulative Retunrs of each beta-based Portfolios**
+**Line chart of Cumulative Retunrs of each beta-sorted Portfolios**
 ```{r, Plotting Results}
 # plot results
 # calculate cumulative returns of each portfolio
@@ -171,7 +172,7 @@ legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", 
 ```{r}
 # load the monthly swissbond data
 
-swissbond_monthly <- read.csv("Swissbond_monthly.csv",sep = ";", header = TRUE, dec = '.')
+swissbond_monthly <- read.csv("Swissbond_monthly.csv",sep = ";", header = TRUE, dec = '.',fileEncoding="UTF-8-BOM")
 datebond_monthly <- as.Date(swissbond_monthly$Date,format="%d.%m.%Y")
 swissbond_monthly <- xts(swissbond_monthly[,-1], order.by = datebond_monthly)
 swissbond_monthly <- swissbond_monthly/100
@@ -179,7 +180,7 @@ swissbond_monthly <- (1+swissbond_monthly)^(1/12)-1
 
 # load the monthly SMI Total return data
 
-SMI_monthly <- read.table("SMIMonthly.csv",sep = ";", header = TRUE, na = "NA")
+SMI_monthly <- read.table("SMIMonthly.csv",sep = ";", header = TRUE, na = "NA",fileEncoding="UTF-8-BOM")
 dateSMI_monthly <- as.Date(SMI_monthly$Date,format="%d.%m.%Y")
 SMI_monthly <- xts(SMI_monthly[,-1], order.by = dateSMI_monthly)
 
@@ -196,7 +197,6 @@ lines(datebond_monthly[71:355], cumulative_returns_SMI, lty = 1, lwd = 3, col = 
 
 legend("topleft", c("Swiss Government Bond", "SMI ETF"), 
        lty = c(1,1), lwd = 3, bty = "n",cex = 1.2, col = c("red", "blue"))
-
 ```
 
 **Comparison of cumulative returns between each beta-based portfolio and SMI ETF as well as Swiss Government Bonds**
