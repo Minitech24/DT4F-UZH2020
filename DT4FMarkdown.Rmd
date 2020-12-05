@@ -7,7 +7,6 @@ output:
   word_document: default
   pdf_document: default
 ---
-
 **Load the data**
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -21,6 +20,9 @@ library(PerformanceAnalytics)
 library(psych)
 library(rollRegres)
 library(roll)
+library(lemon)
+library(knitr)
+library(kableExtra)
 
 # load csv file prices
 prices <- read.table("StockPricesDaily.csv",sep = ";", header = TRUE, na = "NA")
@@ -56,7 +58,7 @@ P_beta_P5_daily <- as.matrix(rep(NA,dim(Daily_betas.ts)[1]))
 ```
 
 
-**Average Daily Return of each beta-based ortfolios**
+**Average Daily Return of each beta-based portfolios**
 ```{r Calculating Returns}
 # use a for loop to go through each time period
 
@@ -104,9 +106,8 @@ print(mean_return_P4<-mean(P_Returns_P4_daily,na.rm=TRUE))
 print(mean_return_P5<-mean(P_Returns_P5_daily,na.rm=TRUE))
 ```
 
-
 **Standard Deviation of each beta-based portfolios**
-```{r Calculating Standar Deviation}
+```{r Calculating Standard Deviation}
 # calculated the mean standard deviation of the five beta-sorted portfolios
 
 sd_P1<-sd(P_Returns_P1_daily,na.rm=TRUE)
@@ -121,7 +122,14 @@ print(sd_P3<-sd(P_Returns_P3_daily,na.rm=TRUE))
 print(sd_P4<-sd(P_Returns_P4_daily,na.rm=TRUE))
 print(sd_P5<-sd(P_Returns_P5_daily,na.rm=TRUE))
 ```
+```{r}
+mean_sd = data.frame(sd_P1, sd_P2, sd_P3, sd_P4, sd_P5)
+mean_sd
+``` 
 
+```{r}
+kable(mean_sd, caption = "Mean Standard Deviation ")
+``` 
 
 **Line chart of Cumulative Retunrs of each beta-based Portfolios**
 ```{r, Plotting Results}
@@ -163,8 +171,8 @@ legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", 
 ```{r}
 # load the monthly swissbond data
 
-swissbond_monthly <- read.csv("Datastream_Swissbond_monthly.csv",sep = ";", header = TRUE, dec = '.')
-datebond_monthly <- as.Date(swissbond_monthly$ï..Date,format="%d.%m.%Y")
+swissbond_monthly <- read.csv("Swissbond_monthly.csv",sep = ";", header = TRUE, dec = '.')
+datebond_monthly <- as.Date(swissbond_monthly$Date,format="%d.%m.%Y")
 swissbond_monthly <- xts(swissbond_monthly[,-1], order.by = datebond_monthly)
 swissbond_monthly <- swissbond_monthly/100
 swissbond_monthly <- (1+swissbond_monthly)^(1/12)-1
@@ -172,7 +180,7 @@ swissbond_monthly <- (1+swissbond_monthly)^(1/12)-1
 # load the monthly SMI Total return data
 
 SMI_monthly <- read.table("SMIMonthly.csv",sep = ";", header = TRUE, na = "NA")
-dateSMI_monthly <- as.Date(SMI_monthly$ï..Date,format="%d.%m.%Y")
+dateSMI_monthly <- as.Date(SMI_monthly$Date,format="%d.%m.%Y")
 SMI_monthly <- xts(SMI_monthly[,-1], order.by = dateSMI_monthly)
 
 # calculate the total return of the stocks and the SMI
