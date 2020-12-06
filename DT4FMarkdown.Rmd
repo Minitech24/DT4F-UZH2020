@@ -2,12 +2,13 @@
 title: "<center> Beta and Stock Returns - A Portfolio Analysis </center>"
 subtitle: "<center> Digital Tools For Finance </center>"
 author: "<center> Kun Zhang, Ziyun Ni, Ruixuan Zhou, Kevin Hardegger </center>"
-date: "<center> Univeristy of Zurich - Fall 2020 </center>"
+date: "<center> University of Zurich - Fall 2020 </center>"
 output:
   html_document: default
   word_document: default
   pdf_document: default
 ---
+
 For our final project in **Digital Tools for Finance** we analyse beta and stock returns of Swiss stocks titles that have been included in the Swiss Market Index (SMI) since its inception in June 1988.
 The goal of this analysis is to analyse how accurate the Capital Asset Pricing Model (CAPM) can be applied to the Swiss Stock Market, and if its derived principles hold truth. 
 
@@ -29,8 +30,8 @@ library(kableExtra)
 ```
 
 ### 1. Loading Data
-We collected the needed data from Datastream and saved them as CSV files. As our next step, we established a database on MySQL called DT4F and inserted the CSV files. By this, we can access the data via SQL queries and have no need for the CSV files anymore. While this step isn't necessary, we decided to adopt it nevertheless, as we wanted to test the combination of R with SQL and get a first glance of how MySQL works.  
-We both include loading of the data with SQL and CSV files, so the viewer can choose which method she prefers. 
+We collected the needed data from Datastream and saved them as CSV files. As our next step, we established a database on MySQL called DT4F and inserted the CSV files. By this, we can access the data via SQL queries and have no need for the CSV files anymore. While this step isn't necessary, we decided to adopt it nevertheless, as we wanted to test the combination between R with SQL and get a first personal glance of how MySQL works.  
+We both include loading of the data with SQL and CSV files, so the viewer can choose which method he prefers. 
 
 #### 1.1 Loading with SQL
 We start with connecting to the MySQL database. 
@@ -188,12 +189,13 @@ mean_beta_P5<-mean(P_beta_P5_daily,na.rm=TRUE)
 # create DF for mean betas
 DF_mean_beta = data.frame(mean_beta_P1, mean_beta_P2, mean_beta_P3, mean_beta_P4, mean_beta_P5)
 DF_mean_beta = melt(DF_mean_beta)
-
+DF_mean_beta = DF_mean_beta %>%
+  mutate(rounded = round(value, 2))
 ``` 
 
 ##### 3.2.1 Average Beta 
 Now we can begin with our analysis of the portfolios. 
-We begin our analysis with the beta values of the various porftolios. The bar chart below explains us the average beta values of each portfolio. As expected portfolio 1 has got the lowest beta with a value of `r DF_mean_beta[1,2]` while portfolio 5 has the highest value of `r DF_mean_beta[1,5]`. Portfolio 3 has a beta value almost equal to 1, which should be equivalent to the beta of the market portoflio according to the CAPM.
+We begin our analysis with the beta values of the various porftolios. The bar chart below explains us the average beta values of each portfolio. As expected portfolio 1 has got the lowest beta with a value of `r DF_mean_beta$rounded[1]`, while portfolio 5 has the highest value of `r DF_mean_beta[5,3]`. Portfolio 3 has a beta value almost exactly equal to 1, which should be equivalent to the beta of the market portoflio according to the CAPM.
 
 ```{r, echo =FALSE,warning=FALSE}
 # create bar chart for mean betas
@@ -318,7 +320,8 @@ mean_sd %>%
 ```
 
 ##### 3.2.4 Summary table 
-Lastly, we can inspect the mean daily returns as well as the mean standard deviation of each portfolio. The following table consolidates our findings:
+Lastly, we can inspect the mean daily returns as well as the mean standard deviation of each portfolio.  
+The following table consolidates our findings:
 
 ```{r, echo =FALSE,warning=FALSE}
 summary_table<-matrix(0,nrow=2,ncol=5,dimnames=list(c("Mean Daily Return","Mean Standard Deviation"),c("Portfolio1","Portfolio2","Portfolio3","Portfolio4","Portfolio5")))
