@@ -128,7 +128,7 @@ SMI_monthly <- xts(SMI_monthly[,-1], order.by = dateSMI_monthly)
 
 ```
 
-### 2. Calculation and Portoflio Building
+### 2. Calculation and Portfolio Building
 Having the tables successfully saved in data frames, we start with the calculation of the daily returns and daily betas. We want to construct 5 portfolios based on their daily beta values which are rebalanced on a daily basis. We calculate the betas, sort these in quintiles, and then build the portfolios in an ascending order. In other words, portfolio 1 will contain the stocks with the lowest daily betas, while portfolio 5 will contain the stocks with the highest beta. 
 
 ```{r,warning=FALSE}
@@ -177,7 +177,7 @@ for (j in 1:dim(Daily_betas.ts)[1])
 ```
 
 ### 3. Analysis 
-#### 3.2 Beta Analysis
+#### 3.1 Beta Analysis
 ```{r, include =FALSE,warning=FALSE}
 # calculate the mean beta of the five beta-sorted portfolios 
 mean_beta_P1<-mean(P_beta_P1_daily,na.rm=TRUE)
@@ -193,7 +193,7 @@ DF_mean_beta = DF_mean_beta %>%
   mutate(rounded = round(value, 2))
 ``` 
 
-##### 3.2.1 Average Beta 
+##### 3.1.1 Average Beta 
 Now we can begin with our analysis of the portfolios. 
 We begin our analysis with the beta values of the various porftolios. The bar chart below explains us the average beta values of each portfolio. As expected portfolio 1 has got the lowest beta with a value of `r DF_mean_beta$rounded[1]`, while portfolio 5 has the highest value of `r DF_mean_beta[5,3]`. Portfolio 3 has a beta value almost exactly equal to 1, which should be equivalent to the beta of the market portoflio according to the CAPM.
 
@@ -209,7 +209,7 @@ DF_mean_beta %>%
   theme(legend.position="none", axis.text.x = element_text(angle=0, vjust=0.6))
 ```
 
-##### 3.2.2 Daily Beta Box Plot
+##### 3.1.2 Daily Beta Box Plot
 Below we can inspect the box plot for the daily betas of each individual portfolios. Obviously, the beta values increase in an ascending order. Portfolio 5 possese the highest variance in beta values which then lowers descendingly. Yet, interstingly the box plot indicates that the beta values of portfolio 1 have higher variance then portfolio 2. 
 ```{r, echo =FALSE,warning=FALSE,message = FALSE}
 # create Dataframe with Daily BETAS & boxplot 
@@ -227,7 +227,7 @@ DF_beta_daily %>%
 
 ``` 
 
-##### 3.2.3 Time Series of Beta Values
+##### 3.1.3 Time Series of Beta Values
 Lastly, we take a view how the beta values behave over time. The line chart outlines this behaviour.We can see how portfolios with higher betas possess higher variance in its movement. Furthermore, the chart suggest repeating patterns of consolidation where the quintile values move closer, followed by a period of expansion where the quintile values drift apart.
 ```{r,echo =FALSE,warning=FALSE}
 # Line Chart of Developments of each beta-sorted Portfolios 
@@ -320,7 +320,7 @@ mean_sd %>%
 ```
 
 ##### 3.2.4 Summary table 
-Lastly, we can inspect the mean daily returns as well as the mean standard deviation of each portfolio.  
+Finally, we can inspect the mean daily returns as well as the mean standard deviation of each portfolio.  
 The following table consolidates our findings:
 
 ```{r, echo =FALSE,warning=FALSE}
