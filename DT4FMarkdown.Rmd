@@ -31,10 +31,11 @@ library(kableExtra)
 
 ### 1. Loading Data
 We collected the needed data from Datastream and saved them as CSV files. As our next step, we established a database on MySQL called DT4F and inserted the CSV files. By this, we can access the data via SQL queries and have no need for the CSV files anymore. While this step isn't necessary, we decided to adopt it nevertheless, as we wanted to test the combination between R with SQL and get a first personal glance of how MySQL works.  
-We both include loading of the data with SQL and CSV files, so the viewer can choose which method he prefers. 
+
+We include both methods for loading the data with SQL and CSV files. Thus, the viewer can choose which method he prefers. Both the SQL and csv files can be found in the github repository and the viewer should not forget to adapt the login details for MySQL. 
 
 #### 1.1 Loading with SQL
-We start with connecting to the MySQL database. 
+We start with connecting to the MySQL database. (Adapt login details)
 Below we see the available tables of our database.
 ```{r, include=FALSE}
 # connect with MySQL
