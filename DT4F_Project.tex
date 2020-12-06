@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[12pt,a4paper,abstracton,fleqn]{article}
 \usepackage[utf8]{inputenc}
 
 \usepackage[
@@ -6,29 +6,74 @@ backend=biber,
 style=alphabetic,
 citestyle=authoryear
 ]{biblatex}
-\usepackage{natbib}
+
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage[utf8]{inputenc}
 \usepackage{float} 
 \usepackage{subfigure}
 \usepackage{ragged2e}
-
-\title{Digital Tools for Finance}
-\author{Kun Zhang, Ziyun Ni, Ruixuan Zhou, Kevin Hardegger }
-\date{15 December 2020}
+\usepackage{blindtext}
+\usepackage{graphicx}
 
 \begin{document}
 
-\maketitle
+
+\begin{titlepage}
+	\centering
+	\includegraphics[width=0.5\textwidth]{UZH LOGO.png}\par\vspace{1cm}
+	%{\scshape\LARGE Digital Tools for Finance \par}
+	{\scshape\LARGE Digital Tools for Finance \par}
+	\vspace{1cm}
+	{\scshape\Large Final Project\par}
+	\vspace{1.5cm}
+	{\huge\bfseries Beta and Stock Returns\par}
+	{\large\bfseries A Portfolio Analysis\par}
+	\vspace{2cm}
+	\leftline
+	{\Large\itshape Kevin Hardegger\par}
+	\vspace{1cm}
+	\leftline
+	{\Large\itshape Kun Zhang\par}
+	\vspace{1cm}
+	\leftline
+	{\Large\itshape Ruixuan Zhou    15-727-019\par}
+	\vspace{1cm}
+	\leftline
+	{\Large\itshape Ziyun Ni\par}
+	\vspace{1cm}
+	\vfill\large
+	supervised by\par
+	Dr.~Igor \textsc{Pozdeev}
+
+	\vfill
+
+% Bottom of the page
+    \vspace{1cm}
+	{\large Submission Date: \today\par}
+\end{titlepage}
+
+\renewcommand*\contentsname{Table of Contents}
+\tableofcontents
+\addtocontents{toc}{~\hfill\textbf{Page}\par}
+\vspace{1cm}
+\listoffigures
+\vspace{1cm}
+\listoftables
+
+\newpage
+\setcounter{page}{1}
+
 
 \section{Introduction}
+
 There is a theory which states that if ever anyone discovers exactly what the Universe is for and why it is here, it will instantly disappear and be replaced by something even more bizarre and inexplicable.
 There is another theory which states that this has already happened.
 
 
 \section{Beta as risk measure}
-According to the CAPM, the expected return of any stock is equal to the return on the riskless asset plus the market beta of this stock plus the market risk premium. Expressed mathematically, the CAPM is
+\begin{justify}
+According to the CAPM, the expected return of any stock is equal to the return on the riskless asset plus the market beta of this stock plus the market risk premium. Expressed mathematically, the CAPM is given by
 
 \begin{equation}
     E[R_{i,t}]=R_{f,t}+\beta_{i}(E[R_{m,t}-R_{f,t}])
@@ -39,11 +84,14 @@ where the security’s beta is given by
 \begin{equation}
      \beta_{i}=\frac{Cov(R_{i,t},R_{m,t})}{Var(R_{m,t})} 
 \end{equation}
-The fundamental prediction of the CAMP theory is that there is a positive relation between market beta and expected stock returns, and the slope defining thsi relation represents the market risk premium. Thus, we would expect to find a positive cross-sectional relation between beta and future excess return.
+$R_{i,t}$, $R_{m,t}$, and $R_{f,t}$ are the return of stock i, the market portfolio, and the risk-free asset in period t. The difference between the expected return of the market portfolio and the risk-free rate $E[R_{m,t}-R_{f,t}$ is defined as the market risk premium. $\beta_{i}$ is the beta of stock i and can be computed as the covariance between the return of stock i and the market return divided by the variance of the return of the market return in period t.
+ 
+The fundamental prediction of the CAPM theory is that there is a positive relation between market beta and expected stock returns, and the slope defining this relation represents the market risk premium. In addition, the CAPM predicts that variation in the expected returns on any stocks should be  driven by variation in the betas of the stock only. Thus, we would expect to find a positive cross-sectional relation between beta and future excess return.
+\end{justify}
 
 \section{Evaluating beta-based portfolio}
-First, we created time series for both datasets, daily betas and daily prices of all stocks that belonged to the SMI. Second, we used daily prices to estimate the daily returns for each stock. Then, for each period of the time series, we ranked the stocks included in the SMI based on their betas in the previous period and divided them into 5 portfolios based on the quintiles 20\%, 40\%, 60\% and 80\%. Subsequently, we continued this process until the last period of the time series. Finally, for each portfolio we calculated the average daily return and the average standard deviation of the daily returns. The table below summarizes the results:
-
+First, we created time series for both datasets, daily betas and daily prices of all stocks that belonged to the SMI. Second, we used daily prices to estimate the daily returns for each stock. Then, for each period of the time series, we ranked the stocks included in the SMI based on their betas in the previous period and divided them into 5 portfolios based on the quintiles 20\%, 40\%, 60\% and 80\%. Portfolios 1 contains stocks with lowest beta and Portfolio 5 contains stocks with highest beta. Subsequently, we continued this process until the last period of the time series. Finally, for each portfolio we calculated the average daily return and the average standard deviation of the daily returns. The table below summarizes the results:
+~\\
 
 \makeatletter\def\@captype{table}\makeatother
 \centering
@@ -61,25 +109,30 @@ Mean standard deviation           & 0.958\% & 1.268\% & 1.455\% & 1.620\% & 1.97
 ~\\
 \begin{justify}
 From above, we can clearly see that the mean standard deviation is low if a portfolio contains stocks with low beta and is high if a portfolio contains the stocks high beta. The magnitudes of the mean daily returns of portfolios 1 to 4 is consistent with the magnitudes of their mean standard deviation. The higher the average standard deviation respective the volatility, the higher the average daily return. One exception is the portfolio 5. It has the highest volatility but surprisingly not the highest mean return, which contradicts the Mean-Variance theory.
-We first calculated cumulative returns for each portfolio and we then plotted them. The plot of the development of each portfolio’s cumulative returns is shown below
+
+To ensure that the daily beta values of each portfolio are always correctly ranked within the observation period, we also draw a line chart showing the average daily beta value for each portfolio. From the figure below, one can observe that the daily beta the portfolio 5 always lies above the daily beta of portfolio 4 at any given time,and so forth.
+
 \begin{figure}[H]
 \centering
-\includegraphics[width=1\textwidth,height=0.7\textwidth]{Cumulative Returns}
-\caption{Cumulative Returns}
-\label{fig:Cumulative Returns}
+\includegraphics[scale=0.8]{daily betas}
+%\includegraphics[width=1\textwidth,height=0.9\textwidth]{daily betas}
+\caption{Development of daily betas}
+\label{fig:Development of daily betas}
+\end{figure}
+
+We then calculated cumulative returns for each portfolio and we then plotted them. The plot of the development of each portfolio’s cumulative returns is shown below
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth,height=0.9\textwidth]{Cumulative Returns}
+\caption{Development of Cumulative Returns}
+\label{fig:Development of Cumulative Returns}
 \end{figure}
 
 
 
-To ensure that the daily beta of each portfolios are correctly ordered, we also draw a line 
-\begin{figure}[H]
-\centering
-\includegraphics[width=1\textwidth,height=0.7\textwidth]{daily betas}
-\caption{daily betas}
-\label{fig:daily betas}
-\end{figure}
+
 From the above chart, we can clearly see that the cumulative return of portfolio 4 is the highest, although the beta of the stocks contained in portfolio 4 are only the second highest. The magnitudes of the cumulative returns of portfolios 1 to 4 is also consistent with the magnitudes of the betas of stocks contained in each portfolio. But surprisingly, although Portfolio 5 contains stocks with the highest beta, his returns are the lowest, which contradicts the CAPM theory that predicts a positive relation between beta and expected returns.
-The risk of a stock can be measured by its standard deviation. However, it can be reduced by diversification effect respective by holding other stocks in a portfolio. This means that the right way to measure the risk of a stock is not by its standard deviation but rather by its covariance with the market portfolio. Thus, the CAPM beta should be a more appropriate risk measure.  But our empirical result above fails to produce supporting evidence, since portfolio 5 should have the highest cumulative return among those beta-sorted portfolios according to the CAPM theory.
+The risk of a stock can be measured by its standard deviation. However, it can be reduced by diversification effect respective by holding other stocks in a portfolio. This means that the right way to measure the risk of a stock is not by its standard deviation but rather by its covariance with the market portfolio. Thus, the CAPM beta should be a more appropriate risk measure.  However, our empirical result above fails to produce supporting evidence,  since portfolio 5, according to the CAPM theory, should have the highest cumulative return among portfolios sorted by beta.
 
 
 \section{Conclusion}
