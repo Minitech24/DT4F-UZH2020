@@ -1,7 +1,8 @@
 ---
-title: "Beta and Stock Returns"
-subtitle: "A Portfolio Analyis"
-author: "Kun Zhang, Ziyun Ni, Ruixuan Zhou, Kevin Hardegger"
+title: "<center> Beta and Stock Returns - A Portfolio Analysis </center>"
+subtitle: "<center> Digital Tools For Finance </center>"
+author: "<center> Kun Zhang, Ziyun Ni, Ruixuan Zhou, Kevin Hardegger </center>"
+date: "<center> Univeristy of Zurich - Fall 2020 </center>"
 output:
   html_document: default
   word_document: default
