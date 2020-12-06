@@ -29,41 +29,44 @@ library(knitr)
 library(kableExtra)
 ```
 
-```{r}
-# # pullin tables from SQL 
-# 
-# mydb <- dbConnect(MySQL(),
-#                   user = "root",
-#                   password = "sqlside13",
-#                   dbnam = "DT4F",
-#                   port = 3306)
-# 
-# # check database for tables
-# dbListTables(mydb)
-``` 
+
 
 ```{r}
-## Loading via SQL
-# 
-# # Load prices table via SQL query
-# prices = dbGetQuery(mydb, "SELECT * FROM stockdailyprices")
-# # convert columns to numeric
-# columns <-c(2:61)
-# prices[, columns] <- lapply(columns, function(x) as.numeric(prices[[x]]))
-# # create returns df
-# date <- as.Date(prices[,1],format="%d.%m.%Y")
-# prices.ts <- xts(x = prices[,-1], order.by = date)
-# returns <- Return.calculate(prices = prices.ts, method = 'discrete')
-# 
-# # Load beta table via SQL query
-# Daily_betas = dbGetQuery(mydb, "SELECT * FROM stockdailybetas")
-# # convert columns to numeric
-# Daily_betas[, columns] <- lapply(columns, function(x) as.numeric(Daily_betas[[x]]))
-# #create beta df
-# date_betas <- as.Date(Daily_betas[,1],format="%d.%m.%Y")
-# Daily_betas <- xts(x = Daily_betas[,-1], order.by = date_betas)
-# Daily_betas.ts <- as.matrix(Daily_betas['1994-04-29/2017-12-28'])
-# Daily_Returns <- as.matrix(returns['1994-04-30/2017-12-29'])
+# pullin tables from SQL
+
+mydb <- dbConnect(MySQL( ),
+                  user = "root",
+                   password = "sqlside13",
+                   dbnam = "DT4F",
+                   port = 3306)
+
+ # check database for tables
+ dbListTables(mydb)
+```
+
+```{r}
+# Loading via SQL
+
+# Load prices table via SQL query
+prices = dbGetQuery(mydb, "SELECT * FROM stockdailyprices")
+# convert columns to numeric
+columns <-c(2:61)
+prices[, columns] <- lapply(columns, function(x) as.numeric(prices[[x]]))
+# create returns df
+date <- as.Date(prices[,1],format="%d.%m.%Y")
+prices.ts <- xts(x = prices[,-1], order.by = date)
+returns <- Return.calculate(prices = prices.ts, method = 'discrete')
+
+# Load beta table via SQL query
+Daily_betas = dbGetQuery(mydb, "SELECT * FROM stockdailybetas")
+# convert columns to numeric
+Daily_betas[, columns] <- lapply(columns, function(x) as.numeric(Daily_betas[[x]]))
+# create beta df
+date_betas <- as.Date(Daily_betas[,1],format="%d.%m.%Y")
+Daily_betas <- xts(x = Daily_betas[,-1], order.by = date_betas)
+Daily_betas.ts <- as.matrix(Daily_betas['1994-04-29/2017-12-28'])
+Daily_Returns <- as.matrix(returns['1994-04-30/2017-12-29'])
+
 ```
 
 
@@ -298,42 +301,42 @@ legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", 
 
 ## Cumulative Return of SMI Index and Swiss Government Bond
 ```{r}
-############################
+# Loading via SQL
+?dbGetQuery
+# Load Swiss Bonds table via SQL query
+swissbond_monthly = dbGetQuery(mydb, "SELECT * FROM swissbondsmonthly")
+# convert columns to numeric
+colbond <-c(2:14)
+swissbond_monthly[, colbond] <- lapply(colbond, function(x) as.numeric(swissbond_monthly[[x]]))
+# modify Swiss bond df
+datebond_monthly <- as.Date(swissbond_monthly$Date,format="%d.%m.%Y")
+swissbond_monthly <- xts(swissbond_monthly[,-1], order.by = datebond_monthly)
+swissbond_monthly <- swissbond_monthly/100
+swissbond_monthly <- (1+swissbond_monthly)^(1/12)-1
 
-## unfinished !!! 
+# Load SMI table via SQL query
+SMI_monthly  = dbGetQuery(mydb, "SELECT * FROM smimonthly")
+# convert columns to numeric 
+colsmi <-c(2:3)
+SMI_monthly[, colsmi] <- lapply(colsmi, function(x) as.numeric(SMI_monthly[[x]]))
+# modify SMI df
+dateSMI_monthly <- as.Date(SMI_monthly$Date,format="%d.%m.%Y")
+SMI_monthly <- xts(SMI_monthly[,-1], order.by = dateSMI_monthly)
 
-############################
-## Loading via SQL
-# # Load Swiss Bonds table via SQL query
-# swissbond_monthly = dbGetQuery(mydb, "SELECT * FROM swissbondsmonthly")
-# 
-# # convert columns to numeric
-# columns <-c(2:61)
-# prices[, columns] <- lapply(columns, function(x) as.numeric(prices[[x]]))
-# 
-# datebond_monthly <- as.Date(swissbond_monthly$Date,format="%d.%m.%Y")
-# swissbond_monthly <- xts(swissbond_monthly[,-1], order.by = datebond_monthly)
-# swissbond_monthly <- swissbond_monthly/100
-# swissbond_monthly <- (1+swissbond_monthly)^(1/12)-1
-# 
-# # Load SMI table via SQL query
-# 
-# dateSMI_monthly <- as.Date(SMI_monthly$Date,format="%d.%m.%Y")
-# SMI_monthly <- xts(SMI_monthly[,-1], order.by = dateSMI_monthly)
 ``` 
 
 
 ```{r}
 # Loading via CSV files
 
-# load the monthly swissbond data
+# load the monthly swissbond data and create DF
 swissbond_monthly <- read.csv("Swissbond_monthly.csv",sep = ";", header = TRUE, dec = '.')
 datebond_monthly <- as.Date(swissbond_monthly$Date,format="%d.%m.%Y")
 swissbond_monthly <- xts(swissbond_monthly[,-1], order.by = datebond_monthly)
 swissbond_monthly <- swissbond_monthly/100
 swissbond_monthly <- (1+swissbond_monthly)^(1/12)-1
 
-# load the monthly SMI Total return data
+# load the monthly SMI Total return data and create DF
 SMI_monthly <- read.table("SMIMonthly.csv",sep = ";", header = TRUE, na = "NA")
 dateSMI_monthly <- as.Date(SMI_monthly$Date,format="%d.%m.%Y")
 SMI_monthly <- xts(SMI_monthly[,-1], order.by = dateSMI_monthly)
@@ -375,7 +378,7 @@ legend("topleft", c("Portfolio 1", "Portfolio 2", "Portfolio 3", "Portfolio 4", 
 
 ### Comparison of Yearly Geometric Return
 ```{r}
-# bar chart for each portfolio 
+# creating Bar Chart for Each Portfolio 
 
 # creating DF for Portfolios
 DF_cumulative_pf = data.frame(cumulative_returns_p1_monthly,
