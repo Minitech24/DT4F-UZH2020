@@ -41,7 +41,7 @@ Below we see the available tables of our database.
 # connect with MySQL
 mydb <- dbConnect(MySQL( ),
                   user = "root",
-                   password = "sqlside13",
+                   password = "Enter your password here",
                    dbname = "DT4F",
                    port = 3306)
 ``` 
